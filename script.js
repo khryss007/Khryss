@@ -1,139 +1,172 @@
-// Configuração das partículas
-particlesJS("particles-js", {
-    particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: "#2BDEFD" },
-        shape: { type: "circle" },
-        opacity: { value: 0.5, random: true },
-        size: { value: 3, random: true },
-        line_linked: { enable: true, distance: 150, color: "#2BDEFD", opacity: 0.2, width: 1 },
-        move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+// Dados do questionário
+const perguntas = [
+    {
+        enunciado: "Você está em uma rua escura quando vê um robô sendo atacado por humanos. O robô parece assustado. O que você faz?",
+        alternativas: [
+            {
+                texto: "Intervenho para proteger o robô - todos os seres sencientes merecem compaixão.",
+                afirmacao: "Você demonstra empatia por seres sintéticos, uma característica rara em humanos."
+            },
+            {
+                texto: "Observo de longe - não é problema meu.",
+                afirmacao: "Você age com cautela, típico de quem vive em Los Angeles 2049."
+            }
+        ]
     },
-    interactivity: {
-        detect_on: "canvas",
-        events: {
-            onhover: { enable: true, mode: "repulse" },
-            onclick: { enable: true, mode: "push" }
-        }
+    {
+        enunciado: "Um replicante implora por mais tempo de vida, alegando ter encontrado amor verdadeiro. Você:",
+        alternativas: [
+            {
+                texto: "Acredita que amor transcende a natureza biológica.",
+                afirmacao: "Sua visão romântica sugere humanidade profunda."
+            },
+            {
+                texto: "Lembra que replicantes têm prazo de validade por razões.",
+                afirmacao: "Pragmatismo típico de agentes da Tyrell Corporation."
+            }
+        ]
+    },
+    {
+        enunciado: "Ao encontrar uma fotografia de infância, você:",
+        alternativas: [
+            {
+                texto: "Sente uma onda de nostalgia autêntica.",
+                afirmacao: "Memórias vívidas indicam experiências humanas reais."
+            },
+            {
+                texto: "Questiona se são memórias implantadas.",
+                afirmacao: "Ceticismo sobre identidade é sintomático em replicantes."
+            }
+        ]
     }
-});
+];
 
-// Seletores atualizados
-const elementos = {
-    pergunta: document.getElementById("pergunta"),
-    alternativas: document.getElementById("alternativas"),
-    resultado: document.getElementById("texto-resultado"),
-    statusBar: document.querySelector(".status-bar")
-};
-
-// ... (mantenha o array de perguntas original)
-
-let atual = 0;
-let perguntaAtual;
-let historiaFinal = "";
-
-function mostraPergunta() {
-    if (atual >= perguntas.length) {
-        mostraResultado();
-        return;
-    }
-    
-    elementos.statusBar.textContent = `STATUS: [QUESTÃO ${atual + 1}/${perguntas.length}]`;
-    perguntaAtual = perguntas[atual];
-    
-    // Animação de digitação para a pergunta
-    typeWriter(elementos.pergunta, perguntaAtual.enunciado, () => {
-        mostraAlternativas();
-    });
-}
-
-function mostraAlternativas() {
-    elementos.alternativas.innerHTML = "";
-    
-    perguntaAtual.alternativas.forEach((alternativa, index) => {
-        const botao = document.createElement("button");
-        botao.innerHTML = `<span class="option-number">${index + 1}.</span> ${alternativa.texto}`;
+// Sistema de renderização
+class BladeRunnerTerminal {
+    constructor() {
+        this.terminal = document.getElementById('terminal-body');
+        this.currentQuestion = 0;
+        this.history = [];
         
-        botao.addEventListener("click", () => {
-            // Efeito sonoro (opcional)
-            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3');
-            audio.volume = 0.3;
-            audio.play();
+        this.init();
+    }
+    
+    init() {
+        this.typeWriter(
+            "INICIANDO TESTE DE EMPATIA VOIGHT-KAMPFF 2.1\n\n" +
+            "OBJETIVO: DETERMINAR SUA CAPACIDADE DE EMPATIA\n" +
+            "EM RELAÇÃO A INTELIGÊNCIAS ARTIFICIAIS\n\n" +
+            "PREPARE-SE...", 
+            () => this.showQuestion(),
+            50
+        );
+    }
+    
+    showQuestion() {
+        if (this.currentQuestion >= perguntas.length) {
+            this.showResults();
+            return;
+        }
+        
+        const q = perguntas[this.currentQuestion];
+        let html = `
+            <div class="question">${q.enunciado}</div>
+            <div class="options" id="options"></div>
+        `;
+        
+        this.terminal.innerHTML = html;
+        
+        const optionsContainer = document.getElementById('options');
+        q.alternativas.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="option-num">${i+1}.</span> ${opt.texto}`;
+            btn.addEventListener('click', () => this.selectOption(opt));
+            optionsContainer.appendChild(btn);
             
-            respostaSelecionada(alternativa);
+            // Animação de entrada
+            setTimeout(() => {
+                btn.style.opacity = '1';
+                btn.style.transform = 'translateY(0)';
+            }, i * 100);
         });
-        
-        elementos.alternativas.appendChild(botao);
-        
-        // Animação de entrada dos botões
-        gsap.from(botao, {
-            opacity: 0,
-            y: 20,
-            duration: 0.3,
-            delay: index * 0.1
-        });
-    });
-}
-
-function respostaSelecionada(opcaoSelecionada) {
-    historiaFinal += opcaoSelecionada.afirmacao + " ";
-    atual++;
-    
-    // Animação de saída
-    gsap.to([elementos.pergunta, elementos.alternativas], {
-        opacity: 0,
-        y: -20,
-        duration: 0.3,
-        onComplete: mostraPergunta
-    });
-}
-
-function mostraResultado() {
-    elementos.statusBar.textContent = "STATUS: [SIMULAÇÃO COMPLETA]";
-    elementos.pergunta.textContent = "EM 2049...";
-    elementos.alternativas.innerHTML = "";
-    
-    // Animação de digitação para o resultado
-    typeWriter(elementos.resultado, historiaFinal);
-    
-    // Efeito de glitch no título
-    const title = document.querySelector(".terminal-title");
-    let glitchCount = 0;
-    const glitchInterval = setInterval(() => {
-        title.textContent = glitchCount % 2 === 0 ? 
-            ">_ SIMULAÇÃO_CONCLUÍDA.EXE" : 
-            ">_ FUTURO_DA_IA.EXE";
-        glitchCount++;
-        if (glitchCount > 6) clearInterval(glitchInterval);
-    }, 100);
-}
-
-// Função de efeito de digitação
-function typeWriter(element, text, callback) {
-    element.innerHTML = "";
-    let i = 0;
-    const speed = 20;
-    
-    function typing() {
-        if (i < text.length) {
-            element.innerHTML += text.charAt(i);
-            i++;
-            setTimeout(typing, speed);
-        } else if (callback) {
-            callback();
-        }
     }
     
-    typing();
+    selectOption(option) {
+        this.history.push(option.afirmacao);
+        this.currentQuestion++;
+        
+        // Efeito de transição
+        this.terminal.style.animation = 'glitch 0.5s';
+        setTimeout(() => {
+            this.terminal.style.animation = '';
+            this.showQuestion();
+        }, 500);
+    }
+    
+    showResults() {
+        const resultText = this.history.join(' ');
+        
+        this.terminal.innerHTML = `
+            <div class="result-screen">
+                <div class="question">ANÁLISE CONCLUÍDA</div>
+                <div class="result-text"></div>
+                <div class="verdict">VEREDITO: ${this.calculateVerdict()}</div>
+            </div>
+        `;
+        
+        // Efeito de digitação
+        this.typeWriter(resultText, null, 30, document.querySelector('.result-text'));
+    }
+    
+    calculateVerdict() {
+        const score = this.history.length > 0 ? 
+            this.history.join(' ').length % 100 : 50;
+        
+        if (score > 70) return "HUMANO - EMPÁTICO";
+        if (score > 30) return "HUMANO - TÍPICO";
+        return "REPLICANTE? INVESTIGAR...";
+    }
+    
+    typeWriter(text, callback, speed = 30, target = null) {
+        const element = target || this.terminal;
+        element.innerHTML = '';
+        let i = 0;
+        
+        function type() {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            } else if (callback) {
+                callback();
+            }
+        }
+        
+        type();
+    }
 }
 
-// Iniciar com efeito
-gsap.from(".terminal-container", {
-    opacity: 0,
-    y: 50,
-    duration: 1,
-    ease: "power3.out"
-});
-
-// Iniciar a primeira pergunta com delay
-setTimeout(mostraPergunta, 1000);
+// Iniciar a experiência quando a janela carregar
+window.onload = () => {
+    // Efeito de inicialização
+    document.body.style.opacity = '1';
+    new BladeRunnerTerminal();
+    
+    // Efeito sonoro (usando Web Audio API)
+    if (window.AudioContext) {
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = 440;
+        
+        const gain = ctx.createGain();
+        gain.gain.value = 0.1;
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+    }
+};
