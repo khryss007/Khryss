@@ -1,4 +1,4 @@
-// Dados do questionário
+// Dados do questionário completo
 const perguntas = [
     {
         enunciado: "Você está em uma rua escura quando vê um robô sendo atacado por humanos. O robô parece assustado. O que você faz?",
@@ -41,13 +41,12 @@ const perguntas = [
     }
 ];
 
-// Sistema de renderização
+// Sistema de renderização corrigido
 class BladeRunnerTerminal {
     constructor() {
         this.terminal = document.getElementById('terminal-body');
         this.currentQuestion = 0;
         this.history = [];
-        
         this.init();
     }
     
@@ -149,11 +148,10 @@ class BladeRunnerTerminal {
 
 // Iniciar a experiência quando a janela carregar
 window.onload = () => {
-    // Efeito de inicialização
     document.body.style.opacity = '1';
     new BladeRunnerTerminal();
     
-    // Efeito sonoro (usando Web Audio API)
+    // Efeito sonoro
     if (window.AudioContext) {
         const ctx = new AudioContext();
         const osc = ctx.createOscillator();
