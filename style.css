@@ -1,43 +1,189 @@
-:root{
-    --cor-fundo: #01080E ;
-    --cor-principal: #0B0D20 ;
+:root {
+    --cor-fundo: #01080E;
+    --cor-principal: #0B0D20;
     --cor-secundaria: #212333; 
     --cor-destaque: #2BDEFD;
     --cor-texto: #D7F9FF;
-
+    --cor-neon: #2BDEFD;
+    --cor-terminal: rgba(11, 13, 32, 0.85);
 }
 
 body {
     background-color: var(--cor-fundo);
     color: var(--cor-texto);
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    position: relative;
 }
 
-.caixa-principal{
-    background-color: var(--cor-principal);
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.terminal-container {
+    background: var(--cor-terminal);
     width: 90%;
-    max-width: 600px;
-    text-align: center;
-    padding: 20px;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px var(--cor-neon);
+    border: 1px solid var(--cor-neon);
+    overflow: hidden;
+    z-index: 1;
+    position: relative;
+    backdrop-filter: blur(5px);
 }
 
-h1{
-    color: var(--cor-destaque);
+.terminal-header {
+    background: var(--cor-principal);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--cor-neon);
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.terminal-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.terminal-btn.close { background: #ff5f56; }
+.terminal-btn.minimize { background: #ffbd2e; }
+.terminal-btn.expand { background: #27c93f; }
+
+.terminal-title {
+    color: var(--cor-neon);
+    font-size: 1rem;
+    margin: 0;
+    text-shadow: 0 0 5px var(--cor-neon);
+    letter-spacing: 1px;
+}
+
+.terminal-body {
+    padding: 30px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.caixa-perguntas {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    line-height: 1.5;
+    text-align: left;
+    border-left: 3px solid var(--cor-neon);
+    padding-left: 15px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.caixa-alternativas {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
 }
 
 button {
-    background-color: var(--cor-secundaria);
+    background: transparent;
     color: var(--cor-texto);
-    border: none;
-    border-radius: 15px;
-    padding: 15px;
-    transition: background-color 0.3s;
+    border: 1px solid var(--cor-neon);
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
 }
 
-button:hover{
-    background-color: var(--cor-destaque);
-    color: var(--cor-principal);
+button:hover {
+    background: rgba(43, 222, 253, 0.1);
+    box-shadow: 0 0 10px var(--cor-neon);
+    transform: translateY(-2px);
 }
+
+button::before {
+    content: ">";
+    position: absolute;
+    left: 10px;
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+button:hover::before {
+    opacity: 1;
+    left: 5px;
+}
+
+.caixa-resultado {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(33, 35, 51, 0.5);
+    border-radius: 4px;
+    border: 1px dashed var(--cor-neon);
+    min-height: 100px;
+}
+
+.typing-animation {
+    line-height: 1.6;
+}
+
+.terminal-footer {
+    background: var(--cor-principal);
+    padding: 8px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--cor-neon);
+    font-size: 0.8rem;
+    color: var(--cor-neon);
+}
+
+.blink {
+    animation: blink 1s infinite;
+}
+
+.status-bar {
+    font-style: italic;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .terminal-body {
+        padding: 20px;
+    }
+    
+    .caixa-perguntas {
+        font-size: 1.1rem;
+    }
+    
+    button {
+        padding: 10px 15px;
+    }
+        }
